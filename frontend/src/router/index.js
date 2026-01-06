@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import CartPage from '../views/CartPage.vue'
-import PathNotFound   from '../views/PathNotFound.vue'
-import HomePage from '../views/HomePage.vue'
+import CartPage from '@/views/CartPage.vue'
+import PathNotFound from '@/views/PathNotFound.vue'
+import HomePage from '@/views/HomePage.vue'
 
 const router = createRouter({
   history: createWebHistory(),
