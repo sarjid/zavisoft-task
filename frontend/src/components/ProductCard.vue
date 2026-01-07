@@ -1,14 +1,12 @@
 <script setup>
-import { computed, resolveComponent } from 'vue'
+import { ShoppingCart, Zap } from 'lucide-vue-next';
 
 const props = defineProps({
   product: {
     type: Object,
     required: true,
   },
-})
-
-
+});
 </script>
 
 <template>
@@ -62,25 +60,13 @@ const props = defineProps({
 
           <button
             class="w-full bg-white border border-primary-600 hover:bg-primary-600 text-primary-700 hover:text-white font-medium py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-              class="lucide lucide-shopping-cart ">
-              <circle cx="8" cy="21" r="1"></circle>
-              <circle cx="19" cy="21" r="1"></circle>
-              <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
-            </svg> Add To Cart
+            <ShoppingCart class="h-4 w-4" /> Add To Cart
           </button>
 
 
           <button
             class="w-full bg-secondary-500 hover:bg-secondary-600 text-white border border-secondary-500 font-medium py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-              class="lucide lucide-zap ">
-              <path
-                d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z">
-              </path>
-            </svg> Buy Now
+            <Zap class="h-4 w-4" /> Buy Now
           </button>
         </div>
       </div>
