@@ -10,7 +10,7 @@ const props = defineProps({
 </script>
 
 <template>
-  <a
+  <RouterLink to="/products/abc"
     class="bg-white rounded-md shadow-sm border border-primary-50 hover:border-primary-600 overflow-hidden flex flex-col transition-all duration-200 hover:shadow-lg">
     <div role="button" class="relative">
       <div class="relative w-full h-48 sm:h-52 overflow-hidden">
@@ -71,5 +71,5 @@ const props = defineProps({
         </div>
       </div>
     </div>
-  </a>
+  </RouterLink>
 </template>

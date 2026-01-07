@@ -37,8 +37,7 @@ const products = [
 
 <template>
     <div class="grid xl:grid-cols-5 gap-5 py-2 text-primary-900">
-        <div
-            class="overflow-hidden -mr-5 xl:overflow-auto xl:-mr-0 xl:bg-white xl:rounded-xl xl:border xl:border-primary-50 xl:h-[calc(100vh-120px)] xl:sticky xl:top-[100px] xl:left-0 xl:self-start col-span-full xl:col-span-1 shadow-sm">
+        <div class="overflow-hidden -mr-5 xl:overflow-auto xl:-mr-0 xl:bg-white xl:rounded-xl xl:border xl:border-primary-50 xl:h-[calc(100vh-120px)] xl:sticky xl:top-[100px] xl:left-0 xl:self-start col-span-full xl:col-span-1 shadow-sm">
             <li class="mx-4 mt-4 mb-4 hidden font-semibold text-secondary-500 xl:block">
                 Categories
             </li>
