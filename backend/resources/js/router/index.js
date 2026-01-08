@@ -10,7 +10,7 @@ const router = createRouter({
   },
   routes: [
     {
-      path: '/',
+      path: '/admin/login',
       name: 'admin-login',
       component: AdminLogin,
     },
