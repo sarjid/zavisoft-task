@@ -4,8 +4,7 @@
         :class="[
             isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
             isExpanded ? 'md:w-72' : 'md:w-20',
-        ]"
-    >
+        ]">
         <div class="flex w-full items-center justify-center gap-3 px-4 md:justify-between">
             <div class="flex items-center gap-3">
                 <div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary-50">
@@ -18,44 +17,37 @@
             </div>
             <button
                 class="hidden h-10 w-10 items-center justify-center rounded-full bg-primary-500 text-white shadow-sm md:flex"
-                type="button"
-                aria-label="Toggle menu"
-                @click="handleToggleSidebar"
-            >
+                type="button" aria-label="Toggle menu" @click="handleToggleSidebar">
                 <component :is="isOpen ? X : (isExpanded ? PanelLeft : Menu)" class="h-5 w-5" />
             </button>
         </div>
 
         <nav class="mt-6 flex flex-1 flex-col gap-1 px-3 text-slate-600">
-            <a
+            <RouterLink
                 v-for="item in primaryMenuItems"
                 :key="item.label"
+                :to="{ name: item.link }"
                 class="flex h-11 w-full items-center justify-center gap-3 rounded-xl px-3 text-sm font-medium transition hover:bg-slate-100"
                 :class="[
                     isExpanded ? 'md:justify-start' : 'md:justify-center md:px-0',
-                    item.isActive ? 'bg-primary-50 font-semibold text-primary-600' : '',
+                    isActiveRoute(item.link) ? 'bg-primary-50 font-semibold text-primary-600' : '',
                 ]"
-                href="#"
-                :aria-label="item.label"
-            >
+                :aria-label="item.label">
                 <component :is="item.icon" class="h-5 w-5" />
                 <span v-show="showLabels" class="md:inline">{{ item.label }}</span>
-            </a>
+            </RouterLink>
 
         </nav>
 
         <div class="mx-3 hidden w-full md:block">
-            <AdminUserMenu
-                :is-open="showUserMenu"
-                :show-label="isExpanded"
-                @toggle="handleToggleUserMenu"
-            />
+            <AdminUserMenu :is-open="showUserMenu" :show-label="isExpanded" @toggle="handleToggleUserMenu" />
         </div>
     </aside>
 </template>
 
 <script setup>
 import { computed } from 'vue';
+import { useRoute } from 'vue-router';
 import AdminUserMenu from '@/components/admin/AdminUserMenu.vue';
 import {
     Folder,
@@ -90,11 +82,17 @@ const emit = defineEmits(['toggle-sidebar', 'toggle-user-menu']);
 
 const showLabels = computed(() => props.isExpanded || props.isOpen);
 
+const route = useRoute();
+
+const isActiveRoute = (routeName) => {
+    return route.name === routeName;
+};
+
 const primaryMenuItems = [
-    { label: 'Dashboard', icon: PanelLeft },
-    { label: 'Categories', icon: Layers },
-    { label: 'Products', icon: Package },
-    { label: 'Orders', icon: ShoppingBag },
+    { label: 'Dashboard', icon: PanelLeft, link: 'admin-dashboard' },
+    { label: 'Categories', icon: Layers, link: 'admin-categories' },
+    // { label: 'Products', icon: Package, link: 'admin-products' },
+    // { label: 'Orders', icon: ShoppingBag, link: 'admin-orders' },
 ];
 
 

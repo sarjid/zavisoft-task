@@ -3,6 +3,7 @@ import { useAuth } from '@/stores/auth'
 import AdminLogin from '@/views/auth/AdminLogin.vue'
 import AdminLayout from '@/views/layouts/AdminLayout.vue'
 import AdminDashboard from '@/views/AdminDashboard.vue'
+import CategoryList from '@/views/CategoryList.vue'
 import PathNotFound from '@/views/PathNotFound.vue'
 
 
@@ -28,6 +29,15 @@ const routes = [
                 name: 'admin-dashboard',
                 component: AdminDashboard,
             },
+
+            {
+                path: 'categories',
+                name: 'admin-categories',
+                component: CategoryList,
+            },
+
+
+
         ],
     },
 

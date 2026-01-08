@@ -17,10 +17,7 @@ const props = defineProps({
         type: Boolean,
         default: true,
     },
-    showProfileActions: {
-        type: Boolean,
-        default: true,
-    },
+
     userName: {
         type: String,
         default: 'Admin',
@@ -90,20 +87,9 @@ const handleLogout = async () => {
                 </div>
             </div>
             <div class="flex flex-col gap-1 pt-2 text-sm font-medium text-slate-600">
-                <template v-if="showProfileActions">
-                    <button class="flex items-center gap-2 rounded-lg px-2 py-2 text-left hover:bg-slate-50"
-                        type="button">
-                        <User class="h-4 w-4" />
-                        My Profile
-                    </button>
-                    <button class="flex items-center gap-2 rounded-lg px-2 py-2 text-left hover:bg-slate-50"
-                        type="button">
-                        <KeyRound class="h-4 w-4" />
-                        Change Password
-                    </button>
-                </template>
+
                 <button @click.prevent="handleLogout"
-                    class="flex items-center gap-2 rounded-lg px-2 py-2 text-left text-primary-600 hover:bg-primary-50"
+                    class="flex items-center gap-2 rounded-lg px-2 py-2 text-left text-primary-600 hover:bg-primary-50 cursor-pointer"
                     type="button">
                     <LogOut class="h-4 w-4" />
                     Logout

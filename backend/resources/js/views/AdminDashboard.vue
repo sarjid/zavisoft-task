@@ -1,3 +1,8 @@
+<script setup>
+import { Calendar, CreditCard, Users } from 'lucide-vue-next';
+</script>
+
+
 <template>
     <section class="space-y-6 px-6 py-6">
         <div class="flex flex-col gap-2">
@@ -66,6 +71,3 @@
     </section>
 </template>
 
-<script setup>
-import { Calendar, CreditCard, Users } from 'lucide-vue-next';
-</script>
