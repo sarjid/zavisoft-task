@@ -1,4 +1,6 @@
 
 import FormLabel from "./FormLabel.vue";
 import PlainTextInput from "./PlainTextInput.vue";
-export { FormLabel, PlainTextInput };
+import VTextInput from "./VTextInput.vue";
+
+export { FormLabel, PlainTextInput,VTextInput };
