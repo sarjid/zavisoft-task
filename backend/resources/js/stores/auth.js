@@ -27,6 +27,8 @@ export const useAuth = defineStore("adminAuth", {
             try {
                 const res = await axiosInstance.post("/admin/login", formData);
                 if (res.status === 200) {
+
+                    console.log(res.data);
                     this.setAuthInfo(res.data?.data);
                     return res.data?.data;
                 }

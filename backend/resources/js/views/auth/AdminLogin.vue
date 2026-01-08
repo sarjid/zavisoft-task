@@ -2,24 +2,25 @@
 
 import { FormLabel, PlainTextInput, VTextInput } from '@/components/form';
 import PrimaryButton from '@/components/button/PrimaryButton.vue';
-import { useAuth } from "@/stores/auth"
+import { LoaderCircle } from 'lucide-vue-next';
 import { useRouter } from "vue-router";
 import { Form } from "vee-validate";
 import * as yup from "yup";
+import { useAuth } from "@/stores/auth";
+const auth = useAuth();
+const router = useRouter();
 
 const schema = yup.object({
     email: yup.string().required().email(),
     password: yup.string().required().min(8),
 });
-const auth = useAuth();
-const router = useRouter();
 
 const onSubmit = async (values, { setErrors, resetForm }) => {
 
     try {
         const res = await auth.login(values);
         if (res.user) {
-            router.push({ name: 'admin.home' });
+            router.push({ name: 'admin-dashboard' });
         }
     } catch (error) {
         setErrors(error);
@@ -46,12 +47,11 @@ const onSubmit = async (values, { setErrors, resetForm }) => {
                             Password
                             <VTextInput type="password" name="password" placeholder="password" />
                         </FormLabel>
-                        <PrimaryButton type="submit" :disabled="isSubmitting">
+                        <PrimaryButton type="submit" class="flex justify-center gap-x-2" :disabled="isSubmitting">
                             Login
+                            <LoaderCircle v-show="isSubmitting" class="spinner" :size="20" />
                         </PrimaryButton>
-
                     </div>
-
                 </Form>
             </div>
         </div>
