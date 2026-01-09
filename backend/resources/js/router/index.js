@@ -4,6 +4,7 @@ import AdminLogin from '@/views/auth/AdminLogin.vue'
 import AdminLayout from '@/views/layouts/AdminLayout.vue'
 import AdminDashboard from '@/views/AdminDashboard.vue'
 import CategoryList from '@/views/CategoryList.vue'
+import ProductList from '@/views/ProductList.vue'
 import PathNotFound from '@/views/PathNotFound.vue'
 
 
@@ -34,6 +35,12 @@ const routes = [
                 path: 'categories',
                 name: 'admin-categories',
                 component: CategoryList,
+            },
+
+             {
+                path: 'products',
+                name: 'admin-products',
+                component: ProductList,
             },
 
 

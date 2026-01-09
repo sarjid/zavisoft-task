@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useAuth, useToken } from "@/stores";
+import router from "@/router";
 
 const axiosInstance = axios.create({
     baseURL: import.meta.env.VITE_APP_URL + "/api",
@@ -28,6 +29,7 @@ axiosInstance.interceptors.response.use(
         if (error.response && error.response.status === 401) {
             const auth = useAuth();
             auth.removeAuthInfo();
+            router.replace({ name: "admin-login" });
         }
         return Promise.reject(error);
     }
