@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateCategoryRequest;
 use App\Http\Resources\CategoryListResource;
 use App\Http\Requests\ChangeCategoryStatusRequest;
 use Illuminate\Http\Request;
+use App\Enums\StatusEnum;
 
 class CategoryController extends Controller
 {
@@ -44,7 +45,23 @@ class CategoryController extends Controller
      */
     public function store(StoreCategoryRequest $request)
     {
-        //
+        $data = $request->validated();
+
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = file_upload($request->file('image'), 'uploads/categories', 'category');
+        }
+
+        $category = Category::create([
+            'name' => $data['name'],
+            'slug' => $data['slug'],
+            'image' => $imagePath,
+            'status' => $data['status'] ?? StatusEnum::INACTIVE->value,
+        ]);
+
+        return $this->successResponse([
+            'category' => new CategoryListResource($category),
+        ], 'Category created successfully', 201);
     }
 
     /**
@@ -68,7 +85,30 @@ class CategoryController extends Controller
      */
     public function update(UpdateCategoryRequest $request, Category $category)
     {
-        //
+        $data = $request->validated();
+
+        $imagePath = $category->image;
+        if ($request->hasFile('image')) {
+            if ($category->image) {
+                $relativePath = ltrim($category->image, '/');
+                $fullPath = public_path($relativePath);
+                if (is_file($fullPath)) {
+                    @unlink($fullPath);
+                }
+            }
+            $imagePath = file_upload($request->file('image'), 'uploads/categories', 'category');
+        }
+
+        $category->update([
+            'name' => $data['name'],
+            'slug' => $data['slug'],
+            'image' => $imagePath,
+            'status' => $data['status'] ?? $category->status,
+        ]);
+
+        return $this->successResponse([
+            'category' => new CategoryListResource($category->fresh()),
+        ], 'Category updated successfully');
     }
 
     /**
@@ -81,6 +121,16 @@ class CategoryController extends Controller
 
     public function multipleDelete(BulkDeleteCategoryRequest $request)
     {
+        $categories = Category::whereIn('id', $request->validated('ids'))->get(['id', 'image']);
+        foreach ($categories as $category) {
+            if ($category->image) {
+                $relativePath = ltrim($category->image, '/');
+                $fullPath = public_path($relativePath);
+                if (is_file($fullPath)) {
+                    @unlink($fullPath);
+                }
+            }
+        }
         $deleted = Category::whereIn('id', $request->validated('ids'))->delete();
 
         return $this->successResponse([

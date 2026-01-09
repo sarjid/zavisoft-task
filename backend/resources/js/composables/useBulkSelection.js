@@ -27,9 +27,24 @@ export default function useBulkSelection(itemsRef, getId = (item) => item.id) {
 
     watch(itemsRef, resetSelection);
 
+    const resolveSelectAllInput = () => {
+        const refValue = selectAllRef.value;
+        if (!refValue) return null;
+
+        const exposedInput = refValue.input?.value;
+        if (exposedInput instanceof HTMLInputElement) return exposedInput;
+        if (refValue instanceof HTMLInputElement) return refValue;
+
+        const rootEl = refValue.$el;
+        if (rootEl instanceof HTMLInputElement) return rootEl;
+
+        return null;
+    };
+
     watch(isIndeterminate, (value) => {
-        if (selectAllRef.value) {
-            selectAllRef.value.indeterminate = value;
+        const input = resolveSelectAllInput();
+        if (input) {
+            input.indeterminate = value;
         }
     });
 

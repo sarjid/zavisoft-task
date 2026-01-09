@@ -1,8 +1,13 @@
 <script setup>
-import { reactive, watch } from "vue";
+import { reactive, ref, watch } from "vue";
 import { useCategory } from "@/stores/category";
-import { Switch, PlainTextInput, SelectInput } from '@/components/form';
+import { Switch, PlainTextInput, SelectInput, CheckboxInput, FormLabel, FileInput } from '@/components/form';
 import AppTable from "@/components/table/AppTable.vue";
+import AppTableCell from "@/components/table/AppTableCell.vue";
+import AppTableRow from "@/components/table/AppTableRow.vue";
+import { EditButton, DeleteButton, PrimaryButton } from "@/components/button";
+import AppModal from "@/components/modal/AppModal.vue";
+
 import useFilters from "@/composables/useFilters";
 import useBulkSelection from "@/composables/useBulkSelection";
 import useToggleStatus from "@/composables/useToggleStatus";
@@ -11,7 +16,6 @@ import { TailwindPagination } from "laravel-vue-pagination";
 import {
     ChevronDown,
     Image,
-    Pencil,
     Plus,
     Search,
     Trash2,
@@ -25,6 +29,25 @@ const categoryFilters = reactive({
     search: "",
     perPage: 8,
     page: 1,
+});
+
+const showCreateModal = ref(false);
+const creating = ref(false);
+const fileInputKey = ref(0);
+const createForm = reactive({
+    name: "",
+    image: null,
+    status: true,
+});
+
+const showEditModal = ref(false);
+const updating = ref(false);
+const editFileInputKey = ref(0);
+const editForm = reactive({
+    id: null,
+    name: "",
+    image: null,
+    status: true,
 });
 
 const perPageOptions = [
@@ -60,15 +83,107 @@ const { toggleStatus } = useToggleStatus((category, nextStatus) => {
 });
 
 const bulkDelete = async () => {
-    if (!selectedIds.value.length) return;
+    if (confirm('Are You Shure Want To Delete This')) {
+
+        if (!selectedIds.value.length) return;
+        try {
+            await categoryStore.bulkDelete(selectedIds.value);
+            notify.success(`${selectedIds.value.length} categories deleted`);
+            resetSelection();
+            await refresh();
+        } catch (error) {
+            notify.error("Failed to delete categories");
+        }
+    }
+};
+
+const resetCreateForm = () => {
+    createForm.name = "";
+    createForm.image = null;
+    createForm.status = true;
+    fileInputKey.value += 1;
+};
+
+const openCreateModal = () => {
+    showCreateModal.value = true;
+};
+
+const closeCreateModal = () => {
+    showCreateModal.value = false;
+    resetCreateForm();
+};
+
+const resetEditForm = () => {
+    editForm.id = null;
+    editForm.name = "";
+    editForm.image = null;
+    editForm.status = true;
+    editFileInputKey.value += 1;
+};
+
+const openEditModal = (category) => {
+    editForm.id = category.id;
+    editForm.name = category.name;
+    editForm.image = category.image || null;
+    editForm.status = Boolean(category.status);
+    editFileInputKey.value += 1;
+    showEditModal.value = true;
+};
+
+const closeEditModal = () => {
+    showEditModal.value = false;
+    resetEditForm();
+};
+
+const createCategory = async () => {
+    if (!createForm.name.trim()) {
+        notify.error("Category name is required");
+        return;
+    }
+
+    creating.value = true;
     try {
-        await categoryStore.bulkDelete(selectedIds.value);
-        notify.success(`${selectedIds.value.length} categories deleted`);
-        resetSelection();
+        const formData = new FormData();
+        formData.append("name", createForm.name.trim());
+        formData.append("status", createForm.status ? 1 : 0);
+        if (createForm.image) {
+            formData.append("image", createForm.image);
+        }
+
+        await categoryStore.store(formData);
+        notify.success("Category created");
+        closeCreateModal();
         await refresh();
     } catch (error) {
-        notify.error("Failed to delete categories");
-        // keep selection for retry
+        notify.error("Failed to create category");
+    } finally {
+        creating.value = false;
+    }
+};
+
+const updateCategory = async () => {
+    if (!editForm.name.trim()) {
+        notify.error("Category name is required");
+        return;
+    }
+
+    updating.value = true;
+    try {
+        const formData = new FormData();
+        formData.append("name", editForm.name.trim());
+        formData.append("status", editForm.status ? 1 : 0);
+        if (editForm.image instanceof File) {
+            formData.append("image", editForm.image);
+        }
+
+        await categoryStore.update(editForm.id, formData);
+        notify.success("Category updated");
+        closeEditModal();
+        await refresh();
+    } catch (error) {
+        notify.error("Failed to update category");
+    } finally {
+        updating.value = false;
     }
 };
 </script>
@@ -86,16 +201,13 @@ const bulkDelete = async () => {
             <div class="flex flex-wrap items-center gap-3">
                 <button
                     class="inline-flex items-center gap-2 rounded-lg bg-primary-500 px-4 py-2 text-sm font-semibold text-white"
-                    type="button">
+                    type="button" @click="openCreateModal">
                     <Plus class="h-4 w-4" />
                     Add New
                 </button>
                 <button
                     class="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 disabled:opacity-50"
-                    type="button"
-                    :disabled="!selectedIds.length"
-                    @click="bulkDelete"
-                >
+                    type="button" :disabled="!selectedIds.length" @click="bulkDelete">
                     <Trash2 class="h-4 w-4" />
                     Delete Selected
                     <span class="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600">
@@ -123,29 +235,18 @@ const bulkDelete = async () => {
                 <template #head>
                     <tr>
                         <th class="px-4 py-3">
-                            <input
-                                ref="selectAllRef"
-                                class="h-4 w-4 rounded border-slate-300 text-primary-600"
-                                type="checkbox"
-                                :checked="allSelected"
-                                @change="toggleAll"
-                            />
+                            <CheckboxInput ref="selectAllRef" :model-value="allSelected" @change="toggleAll" />
                         </th>
                         <th class="px-4 py-3">Categories</th>
                         <th class="px-4 py-3">Status</th>
                         <th class="px-4 py-3 text-right">Manage</th>
                     </tr>
                 </template>
-                <tr v-for="category in categories" :key="category.id" class="border-t border-slate-100">
-                    <td class="px-4 py-3">
-                        <input
-                            v-model="selectedIds"
-                            :value="category.id"
-                            class="h-4 w-4 rounded border-slate-300 text-primary-600"
-                            type="checkbox"
-                        />
-                    </td>
-                    <td class="px-4 py-3">
+                <AppTableRow v-for="category in categories" :key="category.id">
+                    <AppTableCell>
+                        <CheckboxInput v-model="selectedIds" :value="category.id" />
+                    </AppTableCell>
+                    <AppTableCell>
                         <div class="flex items-center gap-3">
                             <div
                                 class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-lg bg-slate-100 text-slate-400">
@@ -155,9 +256,9 @@ const bulkDelete = async () => {
                             </div>
                             <span class="font-semibold text-slate-900">{{ category.name }}</span>
                         </div>
-                    </td>
+                    </AppTableCell>
 
-                    <td class="px-4 py-3">
+                    <AppTableCell>
                         <div class="flex items-center gap-3">
                             <span class="text-xs font-semibold"
                                 :class="category.status ? 'text-emerald-600' : 'text-rose-600'">
@@ -166,22 +267,13 @@ const bulkDelete = async () => {
                             <Switch :model-value="Boolean(category.status)"
                                 @update:modelValue="toggleStatus(category, $event)" />
                         </div>
-                    </td>
-                    <td class="px-4 py-3">
+                    </AppTableCell>
+                    <AppTableCell class="text-right">
                         <div class="flex justify-end gap-2">
-                            <button
-                                class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500 text-white"
-                                type="button">
-                                <Pencil class="h-4 w-4" />
-                            </button>
-                            <button
-                                class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-rose-500 text-white"
-                                type="button">
-                                <Trash2 class="h-4 w-4" />
-                            </button>
+                            <EditButton type="button" @click="openEditModal(category)" />
                         </div>
-                    </td>
-                </tr>
+                    </AppTableCell>
+                </AppTableRow>
             </AppTable>
 
             <div class="mt-5 overflow-x-auto">
@@ -194,5 +286,49 @@ const bulkDelete = async () => {
                 </div>
             </div>
         </div>
+
+        <AppModal v-model="showCreateModal" title="Add Category" @close="resetCreateForm">
+            <div class="space-y-4">
+                <div>
+                    <FormLabel>Category Name</FormLabel>
+                    <PlainTextInput v-model="createForm.name" placeholder="Enter category name" type="text" />
+                </div>
+                <div>
+                    <FormLabel>Image</FormLabel>
+                    <FileInput :key="fileInputKey" v-model="createForm.image" accept="image/*" />
+                </div>
+                <div class="flex items-center justify-between">
+                    <FormLabel>Status</FormLabel>
+                    <Switch v-model="createForm.status" />
+                </div>
+            </div>
+            <template #footer>
+                <PrimaryButton type="button" :disabled="creating" @click="createCategory">
+                    {{ creating ? "Creating..." : "Create Category" }}
+                </PrimaryButton>
+            </template>
+        </AppModal>
+
+        <AppModal v-model="showEditModal" title="Edit Category" @close="resetEditForm">
+            <div class="space-y-4">
+                <div>
+                    <FormLabel>Category Name</FormLabel>
+                    <PlainTextInput v-model="editForm.name" placeholder="Enter category name" type="text" />
+                </div>
+                <div>
+                    <FormLabel>Image</FormLabel>
+                    <FileInput :key="editFileInputKey" v-model="editForm.image" accept="image/*" label="Change image" />
+                </div>
+                <div class="flex items-center justify-between">
+                    <FormLabel>Status</FormLabel>
+                    <Switch v-model="editForm.status" />
+                </div>
+            </div>
+            <template #footer>
+                <PrimaryButton type="button" :disabled="updating" @click="updateCategory">
+                    {{ updating ? "Updating..." : "Update Category" }}
+                </PrimaryButton>
+            </template>
+        </AppModal>
     </section>
 </template>

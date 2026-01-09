@@ -19,7 +19,7 @@ defineProps({
 
 <template>
     <div class="overflow-x-auto rounded-xl border border-slate-200">
-        <table class="w-full text-left text-sm">
+        <table class="min-w-[720px] w-full text-left text-sm">
             <thead class="bg-slate-50 text-xs uppercase text-slate-500">
                 <slot name="head" />
             </thead>

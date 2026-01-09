@@ -62,6 +62,43 @@ export const useCategory = defineStore("category", {
             }
         },
 
+        async store(payload) {
+            this.loading = true;
+            this.error = null;
+            try {
+                const res = await axiosInstance.post("/admin/category", payload, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                });
+                return res?.data;
+            } catch (error) {
+                throw error?.response?.data?.errors || error;
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async update(categoryId, payload) {
+            this.loading = true;
+            this.error = null;
+            try {
+                if (payload instanceof FormData) {
+                    payload.append("_method", "PUT");
+                }
+                const res = await axiosInstance.post(`/admin/category/${categoryId}`, payload, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                });
+                return res?.data;
+            } catch (error) {
+                throw error?.response?.data?.errors || error;
+            } finally {
+                this.loading = false;
+            }
+        },
+
 
 
 
