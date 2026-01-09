@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Http\Requests\BulkDeleteCategoryRequest;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
 use App\Http\Resources\CategoryListResource;
+use App\Http\Requests\ChangeCategoryStatusRequest;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -75,5 +77,26 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         //
+    }
+
+    public function multipleDelete(BulkDeleteCategoryRequest $request)
+    {
+        $deleted = Category::whereIn('id', $request->validated('ids'))->delete();
+
+        return $this->successResponse([
+            'deleted' => $deleted,
+        ], 'Categories deleted successfully');
+    }
+
+    public function changeStatus(ChangeCategoryStatusRequest $request, Category $category)
+    {
+        $category->update([
+            'status' => $request->validated('status'),
+        ]);
+
+        return $this->successResponse([
+            'id' => $category->id,
+            'status' => $category->status,
+        ]);
     }
 }

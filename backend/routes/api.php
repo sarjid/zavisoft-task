@@ -20,5 +20,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:sanctum'])->group(func
     });
 
 
+    Route::controller(CategoryController::class)->group(function () {
+        Route::delete('/category/multiple-delete', 'multipleDelete');
+        Route::put('/category/{category}/status', 'changeStatus');
+    });
     Route::resource('category', CategoryController::class);
 });
