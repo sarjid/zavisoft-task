@@ -44,5 +44,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth:sanctum'])->group(func
 Route::controller(FrontendController::class)->group(function () {
     Route::get('/products', 'products');
     Route::get('/categories', 'categories');
-    Route::get(' /products/{id}', 'singleProduct');
+    Route::get('/products/slug/{slug}', 'product');
 });
+
+Route::get('/products/{product}', [ProductController::class, 'show']);

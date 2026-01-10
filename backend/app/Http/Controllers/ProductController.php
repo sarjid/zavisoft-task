@@ -7,7 +7,6 @@ use App\Models\Product;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
-use App\Http\Resources\ProductDetailResource;
 use App\Models\Attribute;
 use App\Models\AttributeValue;
 use App\Models\Category;
@@ -26,7 +25,6 @@ class ProductController extends Controller
 
         $perPage = $request->input('perPage') ?: 8;
         $products = Product::query()
-            ->select(['id', 'name', 'slug', 'thumbnail', 'unit_price', 'current_stock', 'status'])
             ->withCount('variants')
             ->when($request->input('search'), function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%");
@@ -106,7 +104,7 @@ class ProductController extends Controller
         ]);
 
         return $this->successResponse([
-            'product' => new ProductDetailResource($product),
+            'product' => new ProductResource($product),
         ]);
     }
 

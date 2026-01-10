@@ -235,18 +235,18 @@ const createproduct = async () => {
                     <AppTableCell>
                         <span
                             class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold"
-                            :class="product.variants_count ? 'bg-primary-50 text-primary-700' : 'bg-slate-100 text-slate-600'"
+                            :class="product.has_variant ? 'bg-primary-50 text-primary-700' : 'bg-slate-100 text-slate-600'"
                         >
-                            {{ product.variants_count ? "Variant" : "Single" }}
+                            {{ product.has_variant ? "Variant" : "Single" }}
                         </span>
                     </AppTableCell>
 
                     <AppTableCell>
                         <span
                             class="text-sm font-semibold"
-                            :class="(product.current_stock ?? 0) === 0 ? 'text-rose-600' : 'text-slate-700'"
+                            :class="(product.stock ?? 0) === 0 ? 'text-rose-600' : 'text-slate-700'"
                         >
-                            {{ product.current_stock ?? 0 }}
+                            {{ product.stock ?? 0 }}
                         </span>
                     </AppTableCell>
 
@@ -355,12 +355,7 @@ const createproduct = async () => {
                     </div>
                 </div>
 
-                <div
-                    v-if="viewProduct.description"
-                    class="rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-600"
-                    v-html="viewProduct.description"
-                >
-                </div>
+
 
                 <div v-if="viewProduct.images?.length" class="space-y-2">
                     <div class="text-sm font-semibold text-slate-700">Gallery</div>
@@ -416,6 +411,14 @@ const createproduct = async () => {
                             </div>
                         </div>
                     </div>
+                </div>
+
+
+                <div
+                    v-if="viewProduct.description"
+                    class="rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-600"
+                    v-html="viewProduct.description"
+                >
                 </div>
             </div>
         </AppModal>
