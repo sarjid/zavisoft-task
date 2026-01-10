@@ -20,9 +20,6 @@ import AppSearchBar from '@/components/AppSearchBar.vue';
         </div>
         <div class="flex items-center gap-3 text-sm font-semibold text-slate-700">
           <ul class="md:hidden flex items-center gap-2 md:gap-3"></ul>
-          <RouterLink to="/cart" class="rounded-full px-3 py-2 hover:bg-slate-100">
-            Admin
-          </RouterLink>
           <RouterLink to="/cart"
             class="relative w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center hover:text-primary-600">
             <ShoppingCart />

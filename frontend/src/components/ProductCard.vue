@@ -10,26 +10,36 @@ const props = defineProps({
 </script>
 
 <template>
-  <RouterLink to="/products/abc"
+  <RouterLink :to="{ name: 'product-detail', params: { slug: product.slug || product.id } }"
     class="bg-white rounded-md shadow-sm border border-primary-50 hover:border-primary-600 overflow-hidden flex flex-col transition-all duration-200 hover:shadow-lg">
     <div role="button" class="relative">
       <div class="relative w-full h-48 sm:h-52 overflow-hidden">
-        <img :alt="product.title" loading="lazy" decoding="async" data-nimg="fill"
+        <img :alt="product.name || product.title" loading="lazy" decoding="async" data-nimg="fill"
           class="w-full h-full object-cover transition-transform duration-300 hover:scale-105 p-2 rounded-xl hover:shadow-sm"
-          :src="product.image"
+          :src="product.thumbnail || product.image"
           style="position: absolute; height: 100%; width: 100%; inset: 0; color: transparent; user-select: none;" />
         <div class="absolute bottom-3 right-2 md:top-3 md:right-3">
-          <span class="bg-primary-100 text-primary-800 text-xs font-semibold px-2 py-1 rounded-md">300 BDT</span>
+          <span class="bg-primary-100 text-primary-800 text-xs font-semibold px-2 py-1 rounded-md">
+            <template v-if="product.discount_type === 'percent'">
+              Save {{ product.discount ?? 0 }}%
+            </template>
+            <template v-else>
+              Save Tk {{ product.discount ?? 0 }}
+            </template>
+          </span>
         </div>
       </div>
     </div>
     <div class="px-4 py-3 flex flex-col gap-1 items-center justify-between">
       <div class="flex items-center gap-2">
-        <span class="text-danger-500 text-sm line-through">Tk 800</span>
-        <span class="text-lg sm:text-xl font-bold text-primary-900">Tk 500</span>
+        <span v-if="product.unit_price"
+          class="text-danger-500 text-sm line-through">Tk {{ product.unit_price }}</span>
+        <span class="text-lg sm:text-xl font-bold text-primary-900">
+          Tk {{ product.current_price ?? product.unit_price ?? '' }}
+        </span>
       </div>
       <div class="">
-        <h3 class="text-center text-primary-900 font-normal text-lg line-clamp-2">{{ product.title }}</h3>
+        <h3 class="text-center text-primary-900 font-normal text-lg line-clamp-2">{{ product.name || product.title }}</h3>
       </div>
     </div>
     <div class="px-4 pb-4 flex flex-col gap-2 mt-auto">

@@ -1,39 +1,33 @@
 <script setup>
-import { FileText, Minus, Plus, ZoomIn } from 'lucide-vue-next'
+import { FileText, Minus, Plus } from 'lucide-vue-next'
 import CategoryList from '@/components/CategoryList.vue'
 import ProductCard from '@/components/ProductCard.vue'
+import { useRouter } from 'vue-router'
+import { useProductDetail } from '@/composables/useProductDetail'
 
-const categories = [
-    { name: 'Health & Beauty', image: '/categories/1.jpg' },
-    { name: 'Home Decor', image: '/products/2.jpg' },
-    { name: 'Home & Kitchen', image: '/products/3.jpg' },
-]
+const router = useRouter()
+const {
+    categories,
+    productDetail,
+    productDetailLoading,
+    selectedImage,
+    selectedOptions,
+    galleryImages,
+    selectedVariant,
+    currentPrice,
+    unitPrice,
+    saveAmount,
+    isOutOfStock,
+    stockText,
+    activeImage,
+    relatedProducts,
+    selectOption,
+} = useProductDetail({ relatedPerPage: 12 })
 
-
-const products = [
-    {
-        id: 1,
-        title: 'Multi Layer Shoe Rack',
-        image: '/products/1.jpg',
-    },
-    {
-        id: 2,
-        title: 'Hair Lock Premium Organic Hair Growth Oil- 250 ML',
-        image: '/products/2.jpg',
-    },
-    {
-        id: 3,
-        title: 'Tudo Dish Rack',
-        image: '/products/3.jpg',
-    },
-
-    {
-        id: 4,
-        title: 'Tudo Dish Rack 2',
-        image: '/products/4.jpg',
-    },
-
-]
+const handleCategorySelect = (category) => {
+    const categorySlug = category?.slug
+    router.push({ name: 'products', query: categorySlug ? { category: categorySlug } : {} })
+}
 </script>
 
 <template>
@@ -49,7 +43,8 @@ const products = [
                     <div class="px-5 py-4 bg-primary-50 flex items-center rounded-t-xl">
                         <span class="w-full font-bold text-lg text-secondary-500">Category List</span>
                     </div>
-                    <CategoryList v-for="category in categories" :key="category.id" :category="category" />
+                    <CategoryList v-for="category in categories" :key="category.id" :category="category"
+                        @select="handleCategorySelect" />
                 </div>
             </div>
         </div>
@@ -58,71 +53,129 @@ const products = [
         <div class="col-span-1 xl:col-span-4">
             <div class="block sm:p-5 max-w-full sm:bg-white h-full rounded-xl sm:border sm:border-primary-50">
                 <div style="user-select: none;"></div>
-                <div class="flex flex-col xl:flex-row items-start gap-5">
+                <div v-if="productDetailLoading" class="flex flex-col xl:flex-row items-start gap-5 animate-pulse">
+                    <div class="w-full xl:w-[500px]">
+                        <div class="h-[360px] md:h-[420px] bg-primary-100 rounded-[8px]"></div>
+                        <div class="flex gap-2 flex-wrap mt-2">
+                            <div v-for="item in 4" :key="item"
+                                class="w-[50px] h-[50px] sm:w-[75px] sm:h-[75px] bg-primary-100 rounded-lg"></div>
+                        </div>
+                    </div>
+                    <div class="flex flex-col pt-6 flex-1 w-full">
+                        <div class="grid gap-4">
+                            <div class="h-6 bg-primary-100 rounded w-3/4"></div>
+                            <div class="h-4 bg-primary-100 rounded w-1/3"></div>
+                            <div class="h-8 bg-primary-100 rounded w-1/2"></div>
+                            <div class="h-4 bg-primary-100 rounded w-1/4"></div>
+                            <div class="h-10 bg-primary-100 rounded w-full"></div>
+                            <div class="h-10 bg-primary-100 rounded w-full"></div>
+                        </div>
+                        <div class="w-full my-6">
+                            <div class="h-12 bg-primary-100 rounded w-40"></div>
+                            <div class="mt-4 h-12 bg-primary-100 rounded w-full"></div>
+                            <div class="mt-3 h-12 bg-primary-100 rounded w-full"></div>
+                        </div>
+                    </div>
+                </div>
+                <div v-else class="flex flex-col xl:flex-row items-start gap-5">
                     <div class="w-full xl:w-[500px]">
                         <div class="relative">
-                            <img alt="মাল্টি সেকশন কিচেন অর্গানাইজার" width="512" height="512"
+                            <img :alt="productDetail?.name || 'Product image'" width="512" height="512"
                                 class="rounded-[8px] w-full max-h-[400px] md:max-h-[500px] object-contain"
-                                src="/products/1.jpg" style="color: transparent; user-select: none;">
+                                :src="activeImage" style="color: transparent; user-select: none;">
                             <!-- <div class="absolute bg-primary-600/15 p-3 rounded-full top-2 right-2 z-10 cursor-pointer">
                                 <ZoomIn class="text-white w-5 h-5 md:w-7 md:h-7" />
                             </div> -->
                         </div>
                         <ul class="flex gap-2 flex-wrap mt-2">
-                            <li role="button"
-                                class="w-[50px] min-w-[50px] h-[50px] sm:min-w-[75px] sm:h-[75px] sm:w-[75px] relative rounded-lg overflow-hidden ring-3 ring-primary-100">
-                                <img alt="মাল্টি সেকশন কিচেন অর্গানাইজার_img_0" width="200" height="200"
-                                    class="w-full rounded-lg object-cover" src="/products/1.jpg"
-                                    style="color: transparent; user-select: none;">
-                            </li>
-                            <li role="button"
-                                class="w-[50px] min-w-[50px] h-[50px] sm:min-w-[75px] sm:h-[75px] sm:w-[75px] relative rounded-lg overflow-hidden ring-3 ring-transparent">
-                                <img alt="মাল্টি সেকশন কিচেন অর্গানাইজার_img_1" width="200" height="200"
-                                    class="w-full rounded-lg object-cover" src="/products/2.jpg"
+                            <li v-for="image in galleryImages" :key="image" role="button"
+                                class="w-[50px] min-w-[50px] h-[50px] sm:min-w-[75px] sm:h-[75px] sm:w-[75px] relative rounded-lg overflow-hidden ring-3"
+                                :class="selectedImage === image ? 'ring-primary-100' : 'ring-transparent'"
+                                @click="selectedImage = image">
+                                <img :alt="productDetail?.name || 'Product image'" width="200" height="200"
+                                    class="w-full rounded-lg object-cover" :src="image"
                                     style="color: transparent; user-select: none;">
                             </li>
                         </ul>
 
                     </div>
                     <div class="flex flex-col pt-6 flex-1 w-full">
-                        <div class="grid gap-6">
-                            <h1 class="text-[20px] md:text-2xl font-medium text-black-full">Product Title Will Go Here
-                            </h1>
-                            <div class="flex items-end gap-2">
-                                <div class="flex items-center gap-2"><span
-                                        class="text-xl font-semibold min-w-fit text-black-full">295
-                                        BDT</span><span class="text-sm text-[#8E8E8E] min-w-fit line-through">450
-                                        BDT</span><span
-                                        class="px-2 py-[2px] bg-primary-600 rounded-full text-white text-xs">Save 155
-                                        BDT</span></div>
-                            </div>
-                            <div>
-                                <div class="overflow-hidden" style="height: 0px;">
-                                    <div></div>
+                        <div class="max-w-xl flex flex-col gap-y-6">
+                            <header class="space-y-1">
+                                <p v-if="productDetail?.category?.name"
+                                    class="text-xs font-bold uppercase tracking-widest text-primary-600">
+                                    {{ productDetail.category.name }}
+                                </p>
+                                <h1 class="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
+                                    {{ productDetail?.name || 'Product' }}
+                                </h1>
+
+                                <div class="flex items-center gap-4 pt-1">
+                                    <p v-if="productDetail?.has_variant ? selectedVariant?.sku : productDetail?.sku"
+                                        class="text-sm text-gray-500">
+                                        <span class="font-medium text-gray-400">SKU:</span> {{
+                                            productDetail?.has_variant ? selectedVariant?.sku : productDetail?.sku }}
+                                    </p>
+                                    <div v-if="stockText" class="flex items-center gap-1.5">
+                                        <span :class="isOutOfStock ? 'bg-red-500' : 'bg-green-500'"
+                                            class="h-2 w-2 rounded-full shadow-sm"></span>
+                                        <p class="text-sm font-semibold"
+                                            :class="isOutOfStock ? 'text-red-600' : 'text-green-700'">
+                                            {{ stockText }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </header>
+
+                            <div class="flex items-center gap-4 bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                                <div class="flex flex-col">
+                                    <span class="text-3xl font-bold text-gray-900 tracking-tight">Tk {{ currentPrice
+                                        }}</span>
+                                    <span v-if="unitPrice != null"
+                                        class="text-sm text-gray-400 line-through decoration-red-400/50">
+                                        Tk {{ unitPrice }}
+                                    </span>
+                                </div>
+                                <div v-if="saveAmount" class="ml-auto">
+                                    <span
+                                        class="bg-primary-600 text-white text-[11px] font-bold px-3 py-1.5 rounded-full shadow-sm uppercase tracking-wide">
+                                        Save {{ saveAmount }} BDT
+                                    </span>
                                 </div>
                             </div>
-                            <ul class="flex flex-col gap-[18px]">
-                                <li class="flex flex-col gap-[12px]"><label
-                                        class="text-sm sm:text-base font-[450] text-[#4B5563] capitalize">Quantity</label>
+
+                            <div v-if="productDetail?.options?.length" class="space-y-6">
+                                <div v-for="option in productDetail.options" :key="option.id"
+                                    class="flex flex-col gap-3">
+                                    <div class="flex justify-between items-end px-1">
+                                        <label class="text-xs font-bold text-gray-500 uppercase tracking-widest">
+                                            {{ option.attribute_name }}
+                                        </label>
+                                        <span v-if="selectedOptions[option.attribute_name]"
+                                            class="text-xs font-medium text-primary-600">
+                                            Selected: {{ selectedOptions[option.attribute_name] }}
+                                        </span>
+                                    </div>
+
                                     <ul class="flex gap-3 flex-wrap">
-                                        <li role="button"
-                                            class="lg:pb-[8px] lg:pt-[9px] lg:px-[24px] px-6 pb-2 pt-[9px] cursor-pointer rounded-full text-black-1.2 transition-colors duration-150 flex items-center justify-center gap-[10px] font-medium border-2 border-primary-200 bg-primary-600/10">
-                                            <span class="leading-none text-base text-[#4B5563] font-medium capitalize">1
-                                                Piece</span>
-                                        </li>
-                                        <li role="button"
-                                            class="lg:pb-[8px] lg:pt-[9px] lg:px-[24px] px-6 pb-2 pt-[9px] cursor-pointer rounded-full border-[1.2px] border-[#D1D5DB] bg-white text-black-1.2 transition-colors duration-150 flex items-center justify-center gap-[10px] font-medium">
-                                            <span class="leading-none text-base text-[#4B5563] font-medium capitalize">2
-                                                Piece</span>
-                                        </li>
-                                        <li role="button"
-                                            class="lg:pb-[8px] lg:pt-[9px] lg:px-[24px] px-6 pb-2 pt-[9px] cursor-pointer rounded-full border-[1.2px] border-[#D1D5DB] bg-white text-black-1.2 transition-colors duration-150 flex items-center justify-center gap-[10px] font-medium">
-                                            <span class="leading-none text-base text-[#4B5563] font-medium capitalize">3
-                                                Piece</span>
+                                        <li v-for="value in option.attribute_values" :key="value.value"
+                                            @click="selectOption(option, value)" role="button" tabindex="0" :class="[
+                                                'cursor-pointer select-none px-6 py-2.5 text-sm font-semibold rounded-xl border-2 transition-all duration-200 flex items-center gap-2.5',
+                                                selectedOptions[option.attribute_name] === value.value
+                                                    ? 'border-primary-600 bg-primary-50 text-primary-700 ring-4 ring-primary-600/5'
+                                                    : 'border-gray-200 bg-white text-gray-600 hover:border-primary-300 hover:bg-gray-50'
+                                            ]">
+
+                                            <span v-if="value.color_code"
+                                                class="h-4 w-4 rounded-full border border-black/10 shadow-inner"
+                                                :style="{ backgroundColor: value.color_code }">
+                                            </span>
+
+                                            {{ value.value }}
                                         </li>
                                     </ul>
-                                </li>
-                            </ul>
+                                </div>
+                            </div>
                         </div>
                         <div class="w-full my-6">
                             <div class="flex flex-col items-start gap-4">
@@ -135,13 +188,20 @@ const products = [
                                         min="0" value="1"><button type="button" class="cursor-pointer">
                                         <Plus class="h-5 w-5 md:h-6 md:w-6" />
                                     </button>
-                                </div><button
-                                    class="flex-1 p-4 rounded-lg text-sm font-medium disabled:bg-black-disabled transition-colors duration-150 w-full bg-primary-600 border-2 border-primary-100 text-white disabled:text-white disabled:border-black-disabled cursor-pointer">Add
-                                    To Cart</button>
+                                </div>
+                                <template v-if="!isOutOfStock">
+                                    <button
+                                        class="flex-1 p-4 rounded-lg text-sm font-medium disabled:bg-black-disabled transition-colors duration-150 w-full bg-primary-600 border-2 border-primary-100 text-white disabled:text-white disabled:border-black-disabled cursor-pointer">Add
+                                        To Cart</button>
 
-                                <button
-                                    class="flex-1 p-4 bg-secondary-600 rounded-lg text-sm text-white font-medium disabled:bg-black-disabled transition-colors duration-150 w-full cursor-pointer">Buy
-                                    Now</button>
+                                    <button
+                                        class="flex-1 p-4 bg-secondary-600 rounded-lg text-sm text-white font-medium disabled:bg-black-disabled transition-colors duration-150 w-full cursor-pointer">Buy
+                                        Now</button>
+                                </template>
+                                <button v-else
+                                    class="flex-1 p-4 rounded-lg text-sm font-medium w-full bg-danger-500 text-white cursor-not-allowed">
+                                    Stock Out
+                                </button>
                             </div>
                         </div>
                         <div class="xl:hidden block">
@@ -162,31 +222,8 @@ const products = [
                                 <div
                                     class="text-sm md:text-base text-primary-900 leading-relaxed whitespace-pre-line rounded-xl bg-white/70 border border-primary-50 p-4">
                                     <div>
-                                        <p>
-                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat veniam
-                                            minima, ratione sequi assumenda, vero, quidem totam velit culpa rem ipsum
-                                            laudantium sit maxime aliquam ducimus consectetur repellendus atque ullam
-                                            fuga eum consequatur quisquam voluptatibus! Cumque distinctio vitae
-                                            repellendus quis quasi? Dolorem saepe excepturi qui totam autem quasi
-                                            voluptas fugit similique repellat nisi. Architecto perferendis sapiente
-                                            provident ipsum itaque sequi quibusdam, dignissimos id cupiditate nulla quos
-                                            sed assumenda odio, et voluptatibus, ad deserunt reprehenderit sint! Id
-                                            debitis aliquid harum. Molestias nesciunt eaque beatae accusamus. Cumque
-                                            illum fuga quos dolor mollitia ab, aliquam excepturi voluptatum vero
-                                            repellendus, repudiandae consequuntur obcaecati nulla.
-                                        </p>
-
-                                        <p>
-                                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat veniam
-                                            minima, ratione sequi assumenda, vero, quidem totam velit culpa rem ipsum
-                                            laudantium sit maxime aliquam ducimus consectetur repellendus atque ullam
-                                            fuga eum consequatur quisquam e provident ipsum itaque sequi quibusdam,
-                                            dignissimos id cupiditate nulla quos sed assumenda odio, et voluptatibus, ad
-                                            deserunt reprehenderit sint! Id debitis aliquid harum. Molestias nesciunt
-                                            eaque beatae accusamus. Cumque illum fuga quos dolor mollitia ab, aliquam
-                                            excepturi voluptatum vero repellendus, repudiandae consequuntur obcaecati
-                                            nulla.
-                                        </p>
+                                        <div v-if="productDetail?.description" v-html="productDetail.description"></div>
+                                        <p v-else>No description available.</p>
                                     </div>
                                 </div>
                             </div>
@@ -211,29 +248,8 @@ const products = [
                         <div
                             class="text-sm md:text-base text-primary-900 leading-relaxed whitespace-pre-line rounded-xl bg-white/70 border border-primary-50 p-4">
                             <div>
-                                <p>
-                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat veniam minima,
-                                    ratione sequi assumenda, vero, quidem totam velit culpa rem ipsum laudantium sit
-                                    maxime aliquam ducimus consectetur repellendus atque ullam fuga eum consequatur
-                                    quisquam voluptatibus! Cumque distinctio vitae repellendus quis quasi? Dolorem saepe
-                                    excepturi qui totam autem quasi voluptas fugit similique repellat nisi. Architecto
-                                    perferendis sapiente provident ipsum itaque sequi quibusdam, dignissimos id
-                                    cupiditate nulla quos sed assumenda odio, et voluptatibus, ad deserunt reprehenderit
-                                    sint! Id debitis aliquid harum. Molestias nesciunt eaque beatae accusamus. Cumque
-                                    illum fuga quos dolor mollitia ab, aliquam excepturi voluptatum vero repellendus,
-                                    repudiandae consequuntur obcaecati nulla.
-                                </p>
-                                <br>
-                                <p>
-                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat veniam minima,
-                                    ratione sequi assumenda, vero, quidem totam velit culpa rem ipsum laudantium sit
-                                    maxime aliquam ducimus consectetur repellendus atque ullam fuga eum consequatur
-                                    quisquam e provident ipsum itaque sequi quibusdam, dignissimos id cupiditate nulla
-                                    quos sed assumenda odio, et voluptatibus, ad deserunt reprehenderit sint! Id debitis
-                                    aliquid harum. Molestias nesciunt eaque beatae accusamus. Cumque illum fuga quos
-                                    dolor mollitia ab, aliquam excepturi voluptatum vero repellendus, repudiandae
-                                    consequuntur obcaecati nulla.
-                                </p>
+                                <div v-if="productDetail?.description" v-html="productDetail.description"></div>
+                                <p v-else>No description available.</p>
                             </div>
                         </div>
                     </div>
@@ -247,7 +263,7 @@ const products = [
                             </div>
                         </div>
                         <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-5">
-                            <ProductCard v-for="product in products" :key="product.id" :product="product" />
+                            <ProductCard v-for="product in relatedProducts" :key="product.id" :product="product" />
                         </div>
                     </div>
                 </div>

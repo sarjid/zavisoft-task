@@ -18,6 +18,21 @@
   --color-secondary-600: #1b175d;
   --color-danger-500: #ef4444;
   --color-white: #ffffff;
-  --color-body:#F4F4F5;
+  --color-body: #F4F4F5;
 
+}
+
+.spinner {
+  margin-right: 8px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }

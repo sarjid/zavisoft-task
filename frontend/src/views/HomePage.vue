@@ -2,37 +2,22 @@
 import CategoryCarousel from '@/components/CategoryCarousel.vue'
 import CategoryList from '@/components/CategoryList.vue'
 import ProductCard from '@/components/ProductCard.vue'
+import { SearchX } from 'lucide-vue-next'
+import { useCategoryProducts } from '@/composables/useCategoryProducts'
 
-const categories = [
-    { name: 'Health & Beauty', image: '/categories/1.jpg' },
-    { name: 'Home Decor', image: '/products/2.jpg' },
-    { name: 'Home & Kitchen', image: '/products/3.jpg' },
-]
-
-const products = [
-    {
-        id: 1,
-        title: 'Multi Layer Shoe Rack',
-        image: '/products/1.jpg',
-    },
-    {
-        id: 2,
-        title: 'Hair Lock Premium Organic Hair Growth Oil- 250 ML',
-        image: '/products/2.jpg',
-    },
-    {
-        id: 3,
-        title: 'Tudo Dish Rack',
-        image: '/products/3.jpg',
-    },
-
-    {
-        id: 4,
-        title: 'Tudo Dish Rack 2',
-        image: '/products/4.jpg',
-    },
-
-]
+const {
+    categories,
+    products,
+    productsLoading,
+    productsHasMore,
+    selectedCategorySlug,
+    sortOrder,
+    infiniteScrollSentinel,
+    selectCategory,
+    clearCategory,
+    setSortOrder,
+} = useCategoryProducts({ perPage: 8, routeName: 'products', queryKey: 'category' })
+const productSkeletons = Array.from({ length: 8 }, (_, index) => index)
 </script>
 
 <template>
@@ -47,7 +32,11 @@ const products = [
                     <div class="px-5 py-4 bg-primary-50 flex items-center rounded-t-xl">
                         <span class="w-full font-bold text-lg text-secondary-500">Category List</span>
                     </div>
-                    <CategoryList v-for="category in categories" :key="category.id" :category="category" />
+                    <CategoryList :category="{ id: null, name: 'All Products', slug: null }"
+                        :isActive="!selectedCategorySlug"
+                        @select="clearCategory" />
+                    <CategoryList v-for="category in categories" :key="category.id" :category="category"
+                        :isActive="selectedCategorySlug === category.slug" @select="selectCategory" />
                 </div>
             </div>
 
@@ -61,7 +50,9 @@ const products = [
                     </div>
                     <div class="flex overflow-x-auto gap-3 pb-2 scroll-mb-1 category-x-scrollbar">
                         <div
-                            class="relative w-[120px] min-w-[120px] aspect-[4/5] rounded-2xl overflow-hidden bg-primary-100 shadow-sm border border-primary-50">
+                            class="relative w-[120px] min-w-[120px] aspect-[4/5] rounded-2xl overflow-hidden bg-primary-100 shadow-sm border border-primary-50 cursor-pointer"
+                            :class="!selectedCategorySlug ? 'ring-2 ring-primary-200' : ''"
+                            @click="clearCategory">
                             <div
                                 class="absolute inset-0 bg-gradient-to-br from-primary-500/90 via-primary-600/70 to-primary-900/70">
                             </div>
@@ -73,8 +64,8 @@ const products = [
                                 </div>
                             </div>
                         </div>
-
-                        <CategoryCarousel v-for="category in categories" :key="category.id" :category="category" />
+                        <CategoryCarousel v-for="category in categories" :key="category.id" :category="category"
+                            @select="selectCategory" />
                     </div>
                 </div>
             </div>
@@ -91,6 +82,8 @@ const products = [
                         </h2>
                         <div class="text-primary-900 text-sm flex items-center gap-2"><span class="min-w-fit">Sort
                                 by:</span><select
+                                v-model="sortOrder"
+                                @change="setSortOrder(sortOrder)"
                                 class="text-input py-2 w-[122px] text-sm px-2 mt-0 rounded-lg bg-white border border-primary-50 text-primary-900">
                                 <option value="">Default</option>
                                 <option value="ASC">Price (Low &gt; High)</option>
@@ -98,22 +91,42 @@ const products = [
                             </select></div>
                     </div>
                     <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-1 md:gap-4">
-                        <ProductCard v-for="product in products" :key="product.id" :product="product" />
+                        <template v-if="productsLoading">
+                            <div v-for="item in productSkeletons" :key="item"
+                                class="bg-white rounded-md shadow-sm border border-primary-50 overflow-hidden animate-pulse">
+                                <div class="p-3">
+                                    <div class="h-40 sm:h-44 bg-primary-100 rounded-lg"></div>
+                                    <div class="mt-4 h-4 bg-primary-100 rounded"></div>
+                                    <div class="mt-2 h-4 bg-primary-100 rounded w-3/4"></div>
+                                </div>
+                                <div class="px-4 pb-4">
+                                    <div class="h-10 bg-primary-100 rounded-lg"></div>
+                                </div>
+                            </div>
+                        </template>
+                        <ProductCard v-else v-for="product in products" :key="product.id" :product="product" />
                     </div>
-                    <div class="w-full mx-auto mt-12 px-4 text-gray-600 md:px-8">
-                        <div class="justify-center flex" aria-label="Pagination">
-                            <ul class="flex items-center gap-4">
-                                <li
-                                    class="bg-primary-200 cursor-not-allowed text-primary-800 px-4 py-2.5 border border-primary-100 rounded-lg">
-                                    Previous Page
-                                </li>
-                                <li class="text-secondary-500 font-semibold"><span>1 / 1</span></li>
-                                <li
-                                    class="bg-primary-200 cursor-not-allowed text-primary-800 px-4 py-2.5 border border-primary-100 rounded-lg">
-                                    Next Page
-                                </li>
-                            </ul>
+                    <div v-if="!productsLoading && !products.length"
+                        class="flex flex-col items-center justify-center text-center py-16 px-6 bg-white rounded-xl border border-primary-50 mt-6">
+                        <div
+                            class="h-16 w-16 rounded-full bg-primary-50 text-primary-600 flex items-center justify-center">
+                            <SearchX class="h-8 w-8" />
                         </div>
+                        <h2 class="mt-4 text-xl font-semibold text-secondary-600">No result found</h2>
+                        <p class="mt-2 text-sm text-secondary-500 max-w-md">
+                            No products are available for this category right now. Try another category.
+                        </p>
+                    </div>
+                    <div class="w-full mx-auto mt-8 px-4 text-gray-600 md:px-8">
+                        <div v-if="productsLoading && products.length"
+                            class="text-center text-sm text-secondary-500">
+                            Loading more products...
+                        </div>
+                        <div v-else-if="!productsHasMore && products.length"
+                            class="text-center text-sm text-secondary-500">
+                            No more products
+                        </div>
+                        <div ref="infiniteScrollSentinel" class="h-6"></div>
                     </div>
                 </div>
             </ul>

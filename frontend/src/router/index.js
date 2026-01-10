@@ -16,6 +16,11 @@ const router = createRouter({
       name: 'home',
       component: HomePage,
     },
+    {
+      path: '/products',
+      name: 'products',
+      component: HomePage,
+    },
 
     {
       path: '/cart',
@@ -24,7 +29,7 @@ const router = createRouter({
     },
 
     {
-      path: '/products/:id',
+      path: '/products/:slug',
       name: 'product-detail',
       component: ProductDetail,
       props: true,
