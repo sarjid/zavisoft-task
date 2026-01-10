@@ -7,5 +7,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+
 Route::view('/admin/{any?}', 'app')
     ->where('any', '.*');

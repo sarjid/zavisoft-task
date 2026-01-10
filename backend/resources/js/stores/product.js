@@ -19,7 +19,7 @@ export const useProduct = defineStore("product", {
             this.loading = true;
             this.error = null;
             try {
-                const res = await axiosInstance.get("/admin/product", { params });
+                const res = await axiosInstance.get("/admin/products", { params });
                 if (res.status === 200) {
                     this.products = res.data?.data ?? [];
                 }
@@ -35,7 +35,7 @@ export const useProduct = defineStore("product", {
             this.loading = true;
             this.error = null;
             try {
-                const res = await axiosInstance.put(`/admin/product/${productID}/status`,{
+                const res = await axiosInstance.put(`/admin/products/${productID}/status`,{
                     status: status
                 });
                 // if (res.status === 200) {
@@ -52,7 +52,7 @@ export const useProduct = defineStore("product", {
             this.loading = true;
             this.error = null;
             try {
-                await axiosInstance.delete("/admin/product/multiple-delete", {
+                await axiosInstance.delete("/admin/products/multiple-delete", {
                     data: { ids },
                 });
             } catch (error) {
@@ -66,7 +66,7 @@ export const useProduct = defineStore("product", {
             this.loading = true;
             this.error = null;
             try {
-                const res = await axiosInstance.post("/admin/product", payload, {
+                const res = await axiosInstance.post("/admin/products", payload, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },
@@ -86,12 +86,53 @@ export const useProduct = defineStore("product", {
                 if (payload instanceof FormData) {
                     payload.append("_method", "PUT");
                 }
-                const res = await axiosInstance.post(`/admin/product/${productId}`, payload, {
+                const res = await axiosInstance.post(`/admin/products/${productId}`, payload, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },
                 });
                 return res?.data;
+            } catch (error) {
+                throw error?.response?.data?.errors || error;
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async fetchCreateData() {
+            this.loading = true;
+            this.error = null;
+            try {
+                const res = await axiosInstance.get("/admin/products/create-data");
+                return res?.data?.data ?? {};
+            } catch (error) {
+                throw error?.response?.data?.errors || error;
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async fetchAttributeValues(attributeIds = []) {
+            this.loading = true;
+            this.error = null;
+            try {
+                const res = await axiosInstance.get("/admin/products/attribute-values", {
+                    params: { attribute_ids: attributeIds },
+                });
+                return res?.data?.data ?? {};
+            } catch (error) {
+                throw error?.response?.data?.errors || error;
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async show(productId) {
+            this.loading = true;
+            this.error = null;
+            try {
+                const res = await axiosInstance.get(`/admin/products/${productId}`);
+                return res?.data?.data ?? {};
             } catch (error) {
                 throw error?.response?.data?.errors || error;
             } finally {

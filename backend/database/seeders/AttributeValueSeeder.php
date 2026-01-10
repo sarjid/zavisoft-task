@@ -15,11 +15,10 @@ class AttributeValueSeeder extends Seeder
     public function run(): void
     {
 
-        $attribute = Attribute::create([
-            'name' => 'Color',
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
+        $attribute = Attribute::firstOrCreate(
+            ['name' => 'Color'],
+            ['created_at' => now(), 'updated_at' => now()]
+        );
 
         $colors = [
             ['name' => 'IndianRed', 'code' => '#CD5C5C'],
@@ -168,80 +167,94 @@ class AttributeValueSeeder extends Seeder
 
 
         foreach ($colors as $color) {
-            AttributeValue::create([
-                'attribute_id' => $attribute->id,
-                'value' => $color['name'],
-                'color_code' => $color['code'],
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
+            AttributeValue::firstOrCreate(
+                [
+                    'attribute_id' => $attribute->id,
+                    'value' => $color['name'],
+                ],
+                [
+                    'color_code' => $color['code'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
         }
 
-
-
-        $size = Attribute::create([
-            'name' => 'Size',
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
+        $size = Attribute::firstOrCreate(
+            ['name' => 'Size'],
+            ['created_at' => now(), 'updated_at' => now()]
+        );
 
 
         $sizes = ['S', 'M', 'L', 'XL', 'XXL'];
 
         foreach ($sizes as $sz) {
-            AttributeValue::create([
-                'attribute_id' => $size->id,
-                'value' => $sz,
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
+            AttributeValue::firstOrCreate(
+                [
+                    'attribute_id' => $size->id,
+                    'value' => $sz,
+                ],
+                [
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
         }
 
 
-        $ram = Attribute::create([
-            'name' => 'Ram',
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
+        $ram = Attribute::firstOrCreate(
+            ['name' => 'Ram'],
+            ['created_at' => now(), 'updated_at' => now()]
+        );
         $rams = ['2GB', '3GB', '4GB', '6GB', '8GB'];
         foreach ($rams as $rm) {
-            AttributeValue::create([
-                'attribute_id' => $ram->id,
-                'value' => $rm,
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
+            AttributeValue::firstOrCreate(
+                [
+                    'attribute_id' => $ram->id,
+                    'value' => $rm,
+                ],
+                [
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
         }
 
 
-        $region = Attribute::create([
-            'name' => 'Region',
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
+        $region = Attribute::firstOrCreate(
+            ['name' => 'Region'],
+            ['created_at' => now(), 'updated_at' => now()]
+        );
         $regions = ['USA', 'UK', 'CHINA', 'AUS', 'HK/CN', 'SG/UAE'];
         foreach ($regions as $rg) {
-            AttributeValue::create([
-                'attribute_id' => $region->id,
-                'value' => $rg,
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
+            AttributeValue::firstOrCreate(
+                [
+                    'attribute_id' => $region->id,
+                    'value' => $rg,
+                ],
+                [
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
         }
 
-        $storage = Attribute::create([
-            'name' => 'Storage',
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
+        $storage = Attribute::firstOrCreate(
+            ['name' => 'Storage'],
+            ['created_at' => now(), 'updated_at' => now()]
+        );
         $storages = ['16GB', '32GB', '64GB', '128GB', '256GB'];
         foreach ($storages as $strg) {
-            AttributeValue::create([
-                'attribute_id' => $storage->id,
-                'value' => $strg,
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
+            AttributeValue::firstOrCreate(
+                [
+                    'attribute_id' => $storage->id,
+                    'value' => $strg,
+                ],
+                [
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
         }
     }
 }

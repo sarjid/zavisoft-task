@@ -25,7 +25,7 @@ const resolvedType = computed(() => (props.as === "button" ? props.type : undefi
 
 <template>
     <component :is="componentTag" v-bind="$attrs" :to="resolvedTo" :type="resolvedType"
-        class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-rose-500 text-white">
+        class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-rose-500 text-white cursor-pointer">
         <Trash2 class="h-4 w-4" />
         <slot />
     </component>

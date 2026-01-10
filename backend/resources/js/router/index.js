@@ -4,7 +4,9 @@ import AdminLogin from '@/views/auth/AdminLogin.vue'
 import AdminLayout from '@/views/layouts/AdminLayout.vue'
 import AdminDashboard from '@/views/AdminDashboard.vue'
 import CategoryList from '@/views/CategoryList.vue'
-import ProductList from '@/views/ProductList.vue'
+import ProductList from '@/views/product/ProductList.vue'
+import ProductCreate from '@/views/product/ProductCreate.vue'
+import ProductEdit from '@/views/product/ProductEdit.vue'
 import PathNotFound from '@/views/PathNotFound.vue'
 
 
@@ -41,6 +43,17 @@ const routes = [
                 path: 'products',
                 name: 'admin-products',
                 component: ProductList,
+            },
+
+            {
+                path: 'products/create',
+                name: 'admin-products-create',
+                component: ProductCreate,
+            },
+            {
+                path: 'products/:productId/edit',
+                name: 'admin-products-edit',
+                component: ProductEdit,
             },
 
 

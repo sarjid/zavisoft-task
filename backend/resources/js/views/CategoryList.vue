@@ -5,7 +5,7 @@ import { Switch, PlainTextInput, SelectInput, CheckboxInput, FormLabel, FileInpu
 import AppTable from "@/components/table/AppTable.vue";
 import AppTableCell from "@/components/table/AppTableCell.vue";
 import AppTableRow from "@/components/table/AppTableRow.vue";
-import { EditButton, DeleteButton, PrimaryButton } from "@/components/button";
+import { EditButton, DeleteButton, PrimaryButton, ActionButton } from "@/components/button";
 import AppModal from "@/components/modal/AppModal.vue";
 
 import useFilters from "@/composables/useFilters";
@@ -199,12 +199,12 @@ const updateCategory = async () => {
 
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <div class="flex flex-wrap items-center gap-3">
-                <button
-                    class="inline-flex items-center gap-2 rounded-lg bg-primary-500 px-4 py-2 text-sm font-semibold text-white"
-                    type="button" @click="openCreateModal">
+
+                <ActionButton type="button" @click="openCreateModal">
                     <Plus class="h-4 w-4" />
                     Add New
-                </button>
+                </ActionButton>
+
                 <button
                     class="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 disabled:opacity-50"
                     type="button" :disabled="!selectedIds.length" @click="bulkDelete">
