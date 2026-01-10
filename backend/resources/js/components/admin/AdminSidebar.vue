@@ -91,9 +91,10 @@ const isActiveRoute = (routeName) => {
 const primaryMenuItems = [
     { label: 'Dashboard', icon: PanelLeft, link: 'admin-dashboard' },
     { label: 'Categories', icon: Layers, link: 'admin-categories' },
+    { label: 'Attributes', icon: SlidersHorizontal, link: 'admin-attributes' },
     { label: 'Products', icon: Layers, link: 'admin-products' },
     // { label: 'Products', icon: Package, link: 'admin-products' },
-    // { label: 'Orders', icon: ShoppingBag, link: 'admin-orders' },
+    { label: 'Orders', icon: ShoppingBag, link: 'admin-orders' },
 ];
 
 

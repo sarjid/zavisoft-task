@@ -1,59 +1,77 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Zavisoft Task
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Tech Stack
+- Backend: Laravel (PHP)
+- Frontend: Vue 3, Vite, Pinia, Tailwind CSS
+- Database: Configure in `.env` (e.g., MySQL/MariaDB)
 
-## About Laravel
+## Local Setup
+### Backend
+```bash
+cd backend
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+php artisan serve
+```
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## API Endpoints
+### Frontend API
+- `GET /api/products`
+- `GET /api/categories`
+- `GET /api/products/slug/{slug}`
+- `GET /api/products/{product}`
+- `POST /api/orders`
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Admin API
+- `POST /api/admin/login`
+- `GET /api/admin/me`
+- `POST /api/admin/logout`
+- `GET /api/admin/category`
+- `POST /api/admin/category`
+- `GET /api/admin/category/{category}`
+- `PUT /api/admin/category/{category}`
+- `DELETE /api/admin/category/{category}`
+- `DELETE /api/admin/category/multiple-delete`
+- `PUT /api/admin/category/{category}/status`
+- `GET /api/admin/products`
+- `POST /api/admin/products`
+- `GET /api/admin/products/{product}`
+- `PUT /api/admin/products/{product}`
+- `DELETE /api/admin/products/{product}`
+- `DELETE /api/admin/products/multiple-delete`
+- `PUT /api/admin/products/{product}/status`
+- `GET /api/admin/products/create-data`
+- `GET /api/admin/products/attribute-values`
+- `POST /api/admin/editor-file/upload`
+- `GET /api/admin/orders`
+- `GET /api/admin/orders/{order}`
+- `GET /api/admin/attributes`
+- `POST /api/admin/attributes`
+- `GET /api/admin/attributes/{attribute}`
+- `PUT /api/admin/attributes/{attribute}`
+- `DELETE /api/admin/attributes/{attribute}`
+- `DELETE /api/admin/attributes/multiple-delete`
+- `GET /api/admin/attribute-values`
+- `POST /api/admin/attribute-values`
+- `GET /api/admin/attribute-values/{attribute_value}`
+- `PUT /api/admin/attribute-values/{attribute_value}`
+- `DELETE /api/admin/attribute-values/{attribute_value}`
+- `DELETE /api/admin/attribute-values/multiple-delete`
 
-## Learning Laravel
+## Live Deployment URLs
+- Frontend: Not deployed
+- Admin: Not deployed
+- API: Not deployed
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Admin Login
+- Email: `admin@gmail.com`
+- Password: `password`

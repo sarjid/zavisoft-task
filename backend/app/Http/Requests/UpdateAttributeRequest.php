@@ -11,7 +11,7 @@ class UpdateAttributeRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -21,8 +21,10 @@ class UpdateAttributeRequest extends FormRequest
      */
     public function rules(): array
     {
+        $attributeId = $this->route('attribute')?->id ?? null;
+
         return [
-            //
+            'name' => ['required', 'string', 'max:255', 'unique:attributes,name,' . $attributeId],
         ];
     }
 }

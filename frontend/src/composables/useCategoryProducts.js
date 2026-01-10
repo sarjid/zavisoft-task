@@ -8,6 +8,7 @@ export const useCategoryProducts = (options = {}) => {
         perPage = 8,
         routeName = "home",
         queryKey = "category",
+        searchKey = "search",
         rootMargin = "200px",
     } = options;
 
@@ -20,6 +21,7 @@ export const useCategoryProducts = (options = {}) => {
     const infiniteScrollSentinel = ref(null);
     const selectedCategorySlug = ref(null);
     const sortOrder = ref("");
+    const searchQuery = ref("");
     let observer = null;
 
     const selectedCategoryId = computed(() => {
@@ -33,10 +35,27 @@ export const useCategoryProducts = (options = {}) => {
         );
     });
 
+    const buildQuery = () => {
+        const query = {};
+        if (selectedCategorySlug.value) {
+            query[queryKey] = selectedCategorySlug.value;
+        }
+        if (searchQuery.value) {
+            query[searchKey] = searchQuery.value;
+        }
+        if (sortOrder.value) {
+            query.sort = sortOrder.value;
+        }
+        return query;
+    };
+
     const fetchProductsPage = (page) => {
         const params = { page, perPage };
         if (selectedCategorySlug.value) {
             params.category_slug = selectedCategorySlug.value;
+        }
+        if (searchQuery.value) {
+            params.search = searchQuery.value;
         }
         if (sortOrder.value) {
             params.sort = sortOrder.value;
@@ -47,16 +66,13 @@ export const useCategoryProducts = (options = {}) => {
     const selectCategory = async (category) => {
         const nextSlug = category?.slug ?? null;
         selectedCategorySlug.value = nextSlug;
-        await router.push({
-            name: routeName,
-            query: nextSlug ? { [queryKey]: nextSlug } : {},
-        });
+        await router.push({ name: routeName, query: buildQuery() });
         await fetchProductsPage(1);
     };
 
     const clearCategory = async () => {
         selectedCategorySlug.value = null;
-        await router.push({ name: routeName, query: {} });
+        await router.push({ name: routeName, query: buildQuery() });
         await fetchProductsPage(1);
     };
 
@@ -65,11 +81,19 @@ export const useCategoryProducts = (options = {}) => {
         await fetchProductsPage(1);
     };
 
+    const setSearchQuery = async (value) => {
+        searchQuery.value = value || "";
+        await router.push({ name: routeName, query: buildQuery() });
+        await fetchProductsPage(1);
+    };
+
     onMounted(async () => {
         await shopStore.fetchCategories();
         const initialCategory =
             typeof route.query[queryKey] === "string" ? route.query[queryKey] : null;
         selectedCategorySlug.value = initialCategory;
+        searchQuery.value =
+            typeof route.query[searchKey] === "string" ? route.query[searchKey] : "";
         await fetchProductsPage(1);
 
         observer = new IntersectionObserver(
@@ -96,11 +120,16 @@ export const useCategoryProducts = (options = {}) => {
     });
 
     watch(
-        () => route.query[queryKey],
-        (value) => {
-            const nextSlug = typeof value === "string" ? value : null;
-            if (nextSlug !== selectedCategorySlug.value) {
+        () => [route.query[queryKey], route.query[searchKey]],
+        ([categoryValue, searchValue]) => {
+            const nextSlug = typeof categoryValue === "string" ? categoryValue : null;
+            const nextSearch = typeof searchValue === "string" ? searchValue : "";
+            const changed =
+                nextSlug !== selectedCategorySlug.value ||
+                nextSearch !== searchQuery.value;
+            if (changed) {
                 selectedCategorySlug.value = nextSlug;
+                searchQuery.value = nextSearch;
                 fetchProductsPage(1);
             }
         }
@@ -115,10 +144,12 @@ export const useCategoryProducts = (options = {}) => {
         selectedCategorySlug,
         selectedCategoryId,
         sortOrder,
+        searchQuery,
         infiniteScrollSentinel,
         fetchProductsPage,
         selectCategory,
         clearCategory,
         setSortOrder,
+        setSearchQuery,
     };
 };

@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import CartPage from '@/views/CartPage.vue'
+import OrderSuccess from '@/views/OrderSuccess.vue'
 import PathNotFound from '@/views/PathNotFound.vue'
 import HomePage from '@/views/HomePage.vue'
 import ProductDetail from '@/views/ProductDetail.vue'
@@ -26,6 +27,11 @@ const router = createRouter({
       path: '/cart',
       name: 'cart',
       component: CartPage,
+    },
+    {
+      path: '/order-success',
+      name: 'order-success',
+      component: OrderSuccess,
     },
 
     {

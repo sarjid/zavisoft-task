@@ -7,6 +7,8 @@ import CategoryList from '@/views/CategoryList.vue'
 import ProductList from '@/views/product/ProductList.vue'
 import ProductCreate from '@/views/product/ProductCreate.vue'
 import ProductEdit from '@/views/product/ProductEdit.vue'
+import OrderList from '@/views/order/OrderList.vue'
+import AttributeList from '@/views/attribute/AttributeList.vue'
 import PathNotFound from '@/views/PathNotFound.vue'
 
 
@@ -54,6 +56,16 @@ const routes = [
                 path: 'products/:productId/edit',
                 name: 'admin-products-edit',
                 component: ProductEdit,
+            },
+            {
+                path: 'orders',
+                name: 'admin-orders',
+                component: OrderList,
+            },
+            {
+                path: 'attributes',
+                name: 'admin-attributes',
+                component: AttributeList,
             },
 
 

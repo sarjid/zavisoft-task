@@ -1,11 +1,18 @@
 <script setup>
+import { computed, ref } from 'vue'
 import { FileText, Minus, Plus } from 'lucide-vue-next'
 import CategoryList from '@/components/CategoryList.vue'
 import ProductCard from '@/components/ProductCard.vue'
 import { useRouter } from 'vue-router'
 import { useProductDetail } from '@/composables/useProductDetail'
+import { useCartStore } from '@/stores/cart'
+import useNotify from '@/composables/useNotify'
 
 const router = useRouter()
+const cartStore = useCartStore()
+const notify = useNotify()
+const quantity = ref(1)
+
 const {
     categories,
     productDetail,
@@ -24,9 +31,60 @@ const {
     selectOption,
 } = useProductDetail({ relatedPerPage: 12 })
 
+const requiresVariant = computed(() => {
+    return Boolean(productDetail.value?.has_variant && productDetail.value?.options?.length)
+})
+
+const canAddToCart = computed(() => {
+    if (isOutOfStock.value) {
+        return false
+    }
+    if (requiresVariant.value && !selectedVariant.value) {
+        return false
+    }
+    return true
+})
+
 const handleCategorySelect = (category) => {
     const categorySlug = category?.slug
     router.push({ name: 'products', query: categorySlug ? { category: categorySlug } : {} })
+}
+
+const incrementQty = () => {
+    quantity.value += 1
+}
+
+const decrementQty = () => {
+    quantity.value = Math.max(1, quantity.value - 1)
+}
+
+const handleAddToCart = () => {
+    if (!canAddToCart.value || !productDetail.value) {
+        notify.error(isOutOfStock.value ? 'Product is out of stock' : 'Please select variant options')
+        return
+    }
+    cartStore.addItem({
+        product: productDetail.value,
+        variant: selectedVariant.value,
+        selectedOptions: selectedOptions.value,
+        quantity: quantity.value,
+    })
+    notify.success('Added to cart')
+}
+
+const handleBuyNow = () => {
+    if (!canAddToCart.value || !productDetail.value) {
+        notify.error(isOutOfStock.value ? 'Product is out of stock' : 'Please select variant options')
+        return
+    }
+    cartStore.addItem({
+        product: productDetail.value,
+        variant: selectedVariant.value,
+        selectedOptions: selectedOptions.value,
+        quantity: quantity.value,
+    })
+    notify.success('Added to cart')
+    router.push('/cart')
 }
 </script>
 
@@ -39,7 +97,7 @@ const handleCategorySelect = (category) => {
             </li>
 
             <div class="hidden xl:block">
-                <div class="hover:bg-primary-50/60">
+                <div>
                     <div class="px-5 py-4 bg-primary-50 flex items-center rounded-t-xl">
                         <span class="w-full font-bold text-lg text-secondary-500">Category List</span>
                     </div>
@@ -149,7 +207,7 @@ const handleCategorySelect = (category) => {
                                     class="flex flex-col gap-3">
                                     <div class="flex justify-between items-end px-1">
                                         <label class="text-xs font-bold text-gray-500 uppercase tracking-widest">
-                                            {{ option.attribute_name }}
+                                           Select {{ option.attribute_name }}
                                         </label>
                                         <span v-if="selectedOptions[option.attribute_name]"
                                             class="text-xs font-medium text-primary-600">
@@ -181,22 +239,32 @@ const handleCategorySelect = (category) => {
                             <div class="flex flex-col items-start gap-4">
                                 <div
                                     class="flex items-center justify-between gap-4 text-secondary-600 border border-primary-100 rounded-lg px-[10px] py-1">
-                                    <button type="button" class="cursor-pointer">
+                                    <button type="button" class="cursor-pointer" @click="decrementQty">
                                         <Minus class="h-5 w-5 md:h-6 md:w-6" />
-                                    </button><input type="number"
-                                        class="font-medium text-sm md:text-base text-center w-12 md:w-16 border border-gray-200 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary-100 focus:border-transparent [appearance:textfield] [&amp;::-webkit-outer-spin-button]:appearance-none [&amp;::-webkit-inner-spin-button]:appearance-none"
-                                        min="0" value="1"><button type="button" class="cursor-pointer">
+                                    </button>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        v-model.number="quantity"
+                                        class="font-medium text-sm md:text-base text-center w-12 md:w-16 border border-gray-200 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-primary-100 focus:border-transparent [appearance:textfield] [&amp;::-webkit-outer-spin-button]:appearance-none [&amp;::-webkit-inner-spin-button]:appearance-none" />
+                                    <button type="button" class="cursor-pointer" @click="incrementQty">
                                         <Plus class="h-5 w-5 md:h-6 md:w-6" />
                                     </button>
                                 </div>
                                 <template v-if="!isOutOfStock">
                                     <button
-                                        class="flex-1 p-4 rounded-lg text-sm font-medium disabled:bg-black-disabled transition-colors duration-150 w-full bg-primary-600 border-2 border-primary-100 text-white disabled:text-white disabled:border-black-disabled cursor-pointer">Add
-                                        To Cart</button>
+                                        class="flex-1 p-4 rounded-lg text-sm font-medium disabled:bg-black-disabled transition-colors duration-150 w-full bg-primary-600 border-2 border-primary-100 text-white disabled:text-white disabled:border-black-disabled cursor-pointer"
+                                        :disabled="!canAddToCart"
+                                        @click="handleAddToCart">
+                                        {{ requiresVariant && !selectedVariant ? 'Select variant' : 'Add To Cart' }}
+                                    </button>
 
                                     <button
-                                        class="flex-1 p-4 bg-secondary-600 rounded-lg text-sm text-white font-medium disabled:bg-black-disabled transition-colors duration-150 w-full cursor-pointer">Buy
-                                        Now</button>
+                                        class="flex-1 p-4 bg-secondary-600 rounded-lg text-sm text-white font-medium disabled:bg-black-disabled transition-colors duration-150 w-full cursor-pointer"
+                                        :disabled="!canAddToCart"
+                                        @click="handleBuyNow">
+                                        Buy Now
+                                    </button>
                                 </template>
                                 <button v-else
                                     class="flex-1 p-4 rounded-lg text-sm font-medium w-full bg-danger-500 text-white cursor-not-allowed">

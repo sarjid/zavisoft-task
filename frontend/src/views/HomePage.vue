@@ -28,7 +28,7 @@ const productSkeletons = Array.from({ length: 8 }, (_, index) => index)
             </li>
 
             <div class="hidden xl:block">
-                <div class="hover:bg-primary-50/60">
+                <div>
                     <div class="px-5 py-4 bg-primary-50 flex items-center rounded-t-xl">
                         <span class="w-full font-bold text-lg text-secondary-500">Category List</span>
                     </div>
@@ -60,7 +60,7 @@ const productSkeletons = Array.from({ length: 8 }, (_, index) => index)
                                 <div class="text-xs font-semibold text-white/80">All</div>
                                 <div>
                                     <h3 class="text-lg font-semibold text-white leading-tight">All products</h3>
-                                    <span class="mt-1 inline-flex items-center text-xs text-white/80">120+ items</span>
+                                    <!-- <span class="mt-1 inline-flex items-center text-xs text-white/80">120+ items</span> -->
                                 </div>
                             </div>
                         </div>
