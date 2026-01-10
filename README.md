@@ -1,4 +1,5 @@
-# Zavisoft Task
+# E-commerce Application (Frontend & Backend)
+
 
 ## Tech Stack
 - Backend: Laravel (PHP)
